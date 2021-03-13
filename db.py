@@ -31,7 +31,8 @@ def createUsers():
         email varchar(32) unique not null primary key,\
         pwd varchar(32) not null,\
         utc timestamp not null,\
-        age integer\
+        age integer,\
+        uid integer
     );''')
     conn.commit()
     conn.close()
@@ -95,11 +96,29 @@ def createTeam():
     conn = sqlite3.connect('nesamani.db')
     cur = conn.cursor()
     # Add dp as string later
+    # name varchar(32) not null,\
+    # desc varchar(250) unique not null,\
     cur.execute('''Create Table If Not Exists Team(\
-        tid serial Primary Key,\
-        uid integer,\
-        name varchar(32) not null,\
-        desc varchar(250) unique not null,\
+        pid integer Primary Key,\
+        umail varchar(32),\
+        utc timestamp not null\
+    );''')
+    conn.commit()
+    conn.close()
+
+
+def createLinks():
+    """
+    Function to create the Links table
+    """
+    conn = sqlite3.connect('nesamani.db')
+    cur = conn.cursor()
+    # Add dp as string later
+    # name varchar(32) not null,\
+    # desc varchar(250) unique not null,\
+    cur.execute('''Create Table If Not Exists Link(\
+        pid integer Primary Key,\
+        link varchar(50),\
         utc timestamp not null\
     );''')
     conn.commit()
@@ -115,6 +134,7 @@ def createAll():
     createTags()
     createRatings()
     createTeam()
+    createLinks()
 
 
 if __name__ == '__main__':

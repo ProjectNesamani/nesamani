@@ -16,8 +16,8 @@ def createUser():
     conn = sqlite3.connect('nesamani.db')
     cur = conn.cursor()
     try:
-        cur.execute(f"""insert into Users (name, email, pwd, utc, age) values(\
-            '{args['name']}','{args['email']}','{args['pwd']}',{time()},{args['age']}\
+        cur.execute(f"""insert into Users (name, email, pwd, utc, age, uid) values(\
+            '{args['name']}','{args['email']}','{args['pwd']}',{time()},{args['age']}, {randint(0, 999999)}\
         );""")
         conn.commit()
         conn.close()
@@ -151,20 +151,135 @@ def createProject():
             return {"msg": "Error!"}, 404
     return {"msg": "User not logged in!"}, 404
 
+
 @app.route('/api/feed', methods=["GET"])
 def getFeed():
     """
     Get all projects for feed
     """
-    args = request.get_json()
     try:
         conn = sqlite3.connect('nesamani.db')
         cur = conn.cursor()
         cur.execute('select * from projects')
-        cur.fetchall()
-        
+        data = cur.fetchall()
+        response = {
+            "pid": [x[0] for x in data],
+            'title': [x[1] for x in data],
+            'desc': [x[2] for x in data],
+            'umail': [x[3] for x in data],
+            'utc': [x[4] for x in data]
+        }
+        conn.close()
+        return response, 200
     except:
+        conn.close()
         return {"msg": "ERROR!"}
+
+
+@app.route('/api/getProject', methods=["GET"])
+def getProject():
+    """
+    Takes pid (project id) as input
+    """
+    pid = request.get_json()['pid']
+    try:
+        conn = sqlite3.connect('nesamani.db')
+        cur = conn.cursor()
+        cur.execute(f'select * from projects where pid={pid}')
+        x = cur.fetchone()
+        response = {
+            "pid": x[0],
+            'title': x[1],
+            'desc': x[2],
+            'umail': x[3],
+            'utc': x[4]
+        }
+        conn.close()
+        return response, 200
+    except:
+        conn.close()
+        return {"msg": "Project not found!"}, 404
+
+
+@app.route('/api/addTeamMate', methods=['POST'])
+def addTeammate():
+    """
+    umail : Mail of project owner
+    omail : mail of person to add, can be element or list
+    pid   : project id
+    """
+    args = request.get_json()
+    if args['umail'] not in sessions:
+        return {"msg": "user not signed in!"}, 404
+    # try:
+    if True:
+        conn = sqlite3.connect('nesamani.db')
+        cur = conn.cursor()
+        cur.execute(f'select umail from projects where pid={args["pid"]}')
+        x = cur.fetchone()
+        if not x[0] == args['umail']:
+            return {"msg": "You don't have permission!"}, 405
+        if type(args['omail']) == list:
+            for mail in args['omail']:
+                data = cur.execute("select email from users;")
+                users = data.fetchall()
+                print(users)
+                if mail not in users:
+                    return {"msg": "user no exist"}, 404
+                cur.execute(f'''insert into team (tid, uid, utc) values(\
+                    {args["pid"]}
+                    "{mail}",\
+                    {time()}
+                );''')
+                conn.commit()
+        elif type(args['omail']) == str:
+            data = cur.execute("select email from users;")
+            users = data.fetchall()
+            for user in users:
+                print(user)
+                if user[0] == args['omail']:
+                    break
+            else:
+                return {"msg": "user no exist"}, 404
+            
+            cur.execute(f"""insert into team (tid, uid, utc) values(\
+                {args["pid"]}
+                '{args["omail"]}',\
+                {time()}
+            );""")
+    ''' 
+    except:
+        conn.close()
+        return {"msg": "Project not found 2!"}, 404
+    '''
+
+
+@app.route('/api/getProjectLink', methods=["GET"])
+def getProjectLink():
+    args = request.get_json()
+    try:
+        conn = sqlite3.connect('nesamani.db')
+        cur = conn.cursor()
+        cur.execute(f'select link from link where pid={pid}')
+        x = cur.fetchone()
+        return {"link": x[0]}, 200
+    except:
+        conn.close()
+        return {"msg": "Link not found!"}, 404
+
+
+@app.route('/api/postProjectLink', methods=["GET"])
+def setProjectLink():
+    pid = request.get_json()["pid"]
+    try:
+        conn = sqlite3.connect('nesamani.db')
+        cur = conn.cursor()
+        cur.execute(f'select link from link where pid={pid}')
+        x = cur.fetchone()
+        return {"link": x[0]}, 200
+    except:
+        conn.close()
+        return {"msg": "Link not found!"}, 404
 
 if __name__ == '__main__':
     app.run(debug=True)

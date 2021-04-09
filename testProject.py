@@ -16,7 +16,7 @@ response = requests.get(BASE+'/loginUser', json={
     "email": "realaddress@fake.com",
     })
 print(response.json())
-'''
+
 # 2. Create Project with existing user who is logged in
 response = requests.post(BASE+'/createProject', json={
     "title": "A Project",
@@ -24,7 +24,7 @@ response = requests.post(BASE+'/createProject', json={
     "email": "realaddress@fake.com",
     })
 print(response.json())
-'''
+
 # 3. Get projects for feed
 response = requests.get(BASE+'/feed')
 print(response.json())
@@ -51,5 +51,5 @@ response = requests.post(BASE+'/addTeamMate', json={
     "pid": 217303,
     "umail": "realaddress@fake.com",
     "omail": "cloud@fake.com"
-    })
+})
 print(response.json())

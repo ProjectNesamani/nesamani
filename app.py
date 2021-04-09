@@ -1,7 +1,10 @@
 from flask import Flask, request
-from time import time
+import time
 from random import randint
 import sqlite3
+import datetime
+
+
 app = Flask(__name__)
 sessions = []
 
@@ -17,7 +20,7 @@ def createUser():
     cur = conn.cursor()
     try:
         cur.execute(f"""insert into Users (name, email, pwd, utc, age, uid) values(\
-            '{args['name']}','{args['email']}','{args['pwd']}',{time()},{args['age']}, {randint(0, 999999)}\
+            '{args['name']}','{args['email']}','{args['pwd']}',{time.time()},{args['age']}, {randint(0, 999999)}\
         );""")
         conn.commit()
         conn.close()
@@ -69,10 +72,9 @@ def getUser():
         if details[0]:
             if args['email'] not in sessions:
                 data = {
-                    'name': details[0],
+                    'user_name': details[0],
                     'email': details[1],
-                    'utc': details[3],
-                    'age': details[4]
+                    'joined_on': time.strftime("%D", time.localtime(details[3])),
                 }
                 return data, 200
         else:
@@ -132,7 +134,7 @@ def createProject():
     args = request.get_json()
     if args['email'] in sessions:
         pid = randint(0, 9999999)
-        utc = time()
+        utc = time.time()
         try:
             conn = sqlite3.connect('nesamani.db')
             cur = conn.cursor()
@@ -229,7 +231,7 @@ def addTeammate():
                 cur.execute(f'''insert into team (tid, uid, utc) values(\
                     {args["pid"]}
                     "{mail}",\
-                    {time()}
+                    {time.time()}
                 );''')
                 conn.commit()
         elif type(args['omail']) == str:
@@ -245,7 +247,7 @@ def addTeammate():
             cur.execute(f"""insert into team (tid, uid, utc) values(\
                 {args["pid"]}
                 '{args["omail"]}',\
-                {time()}
+                {time.time()}
             );""")
     ''' 
     except:

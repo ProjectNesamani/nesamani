@@ -15,6 +15,9 @@ Create Tables
 
 5. Team
     name, tagline, uid, tid, utc
+
+6. Links
+    pid, link, utc
 '''
 import sqlite3
 

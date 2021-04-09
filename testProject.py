@@ -40,13 +40,13 @@ response = requests.get(BASE+'/getProject', json={
 print(response.json())
 # 6. Add teammate to project that exists
 
-requests.post(BASE+'/createUser', json={
+response = requests.post(BASE+'/createUser', json={
     "name": "Agastya",
     "pwd": "CloudLead",
     "email": "cloud@fake.com",
     "age": 21
     })
-
+print(response.json())
 response = requests.post(BASE+'/addTeamMate', json={
     "pid": 217303,
     "umail": "realaddress@fake.com",

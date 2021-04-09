@@ -19,9 +19,8 @@ def createUser():
     conn = sqlite3.connect('nesamani.db')
     cur = conn.cursor()
     try:
-        cur.execute(f"""insert into Users (name, email, pwd, utc, age, uid) values(\
-            '{args['name']}','{args['email']}','{args['pwd']}',{time.time()},{args['age']}, {randint(0, 999999)}\
-        );""")
+        cur.execute(f"""insert into Users (name, email, pwd, utc, age, uid) values(?, ?, ?, ?, ?, ?)""",
+             (args['name'],args['email'],args['pwd'],time.time(),args['age'], randint(0, 999999)))
         conn.commit()
         conn.close()
         return {"message": "Inserted into DB successfully!"}, 201
@@ -40,7 +39,7 @@ def loginUser():
     conn = sqlite3.connect('nesamani.db')
     cur = conn.cursor()
     try:
-        cur.execute(f'select pwd from users where email="{args["email"]}";')
+        cur.execute(f"select pwd from users where email=?",(args["email"],))
         pwd = cur.fetchone()
         # print(pwd)
         if pwd[0] == args['pwd']:
@@ -66,7 +65,7 @@ def getUser():
     conn = sqlite3.connect('nesamani.db')
     cur = conn.cursor()
     try:
-        cur.execute(f'select * from users where email="{args["email"]}";')
+        cur.execute(f"select * from users where email=?", (args["email"],))
         details = cur.fetchone()
         # print(pwd)
         if details[0]:
@@ -138,13 +137,12 @@ def createProject():
         try:
             conn = sqlite3.connect('nesamani.db')
             cur = conn.cursor()
-            cur.execute(f"""insert into Projects(pid, title, desc, umail, utc) values(\
-                {pid},\
-                '{args['title']}',\
-                '{args['desc']}',\
-                '{args['email']}',\
-                {utc}
-            );""")
+            cur.execute(f"""insert into Projects(pid, title, desc, umail, utc) values(?,?,?,?,?)""",
+                (pid,
+                args['title'],
+                args['desc'],
+                args['email'],
+                utc))
             conn.commit()
             conn.close()
             return {"msg": "Project Created Successfully!"}, 201
@@ -187,7 +185,7 @@ def getProject():
     try:
         conn = sqlite3.connect('nesamani.db')
         cur = conn.cursor()
-        cur.execute(f'select * from projects where pid={pid}')
+        cur.execute(f'select * from projects where pid=?',(pid,))
         x = cur.fetchone()
         response = {
             "pid": x[0],
@@ -217,7 +215,7 @@ def addTeammate():
     if True:
         conn = sqlite3.connect('nesamani.db')
         cur = conn.cursor()
-        cur.execute(f'select umail from projects where pid={args["pid"]}')
+        cur.execute(f'select umail from projects where pid=?', (args["pid"],))
         x = cur.fetchone()
         if not x[0] == args['umail']:
             return {"msg": "You don't have permission!"}, 405
@@ -228,11 +226,7 @@ def addTeammate():
                 print(users)
                 if mail not in users:
                     return {"msg": "user no exist"}, 404
-                cur.execute(f'''insert into team (tid, uid, utc) values(\
-                    {args["pid"]}
-                    "{mail}",\
-                    {time.time()}
-                );''')
+                cur.execute(f'''insert into team (tid, uid, utc) values(?,?,?)''', (args["pid"], mail,time.time()))
                 conn.commit()
         elif type(args['omail']) == str:
             data = cur.execute("select email from users;")
@@ -243,17 +237,16 @@ def addTeammate():
                     break
             else:
                 return {"msg": "user no exist"}, 404
-            
-            cur.execute(f"""insert into team (tid, uid, utc) values(\
-                {args["pid"]}
-                '{args["omail"]}',\
-                {time.time()}
-            );""")
-    ''' 
-    except:
-        conn.close()
-        return {"msg": "Project not found 2!"}, 404
-    '''
+
+            cur.execute(f"""insert into team (tid, uid, utc) values(?,?,?)""",
+                (args["pid"],
+                args["omail"],
+                time.time()))
+
+    #except:
+    #    conn.close()
+    #    return {"msg": "Project not found 2!"}, 404
+
 
 
 @app.route('/api/getProjectLink', methods=["GET"])
@@ -262,7 +255,7 @@ def getProjectLink():
     try:
         conn = sqlite3.connect('nesamani.db')
         cur = conn.cursor()
-        cur.execute(f'select link from link where pid={pid}')
+        cur.execute(f'select link from link where pid=?',(pid,))
         x = cur.fetchone()
         return {"link": x[0]}, 200
     except:
@@ -276,7 +269,7 @@ def setProjectLink():
     try:
         conn = sqlite3.connect('nesamani.db')
         cur = conn.cursor()
-        cur.execute(f'select link from link where pid={pid}')
+        cur.execute(f'select link from link where pid=?',(pid,))
         x = cur.fetchone()
         return {"link": x[0]}, 200
     except:

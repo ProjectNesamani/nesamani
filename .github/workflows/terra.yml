@@ -93,7 +93,9 @@ jobs:
 
     # Generates an execution plan for Terraform
     - name: Terraform Plan
-      run: terraform plan
+      run: |
+        echo "${{ secrets.GOOGLE_CREDENTIALS }}"
+        terraform plan
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 

@@ -104,7 +104,7 @@ jobs:
       if: github.ref == 'refs/heads/master' && github.event_name == 'push'
       run: |
         echo "$GOOGLE_APPLICATION_CREDENTIALS" >> "$FILE"
-        gcloud auth activate-service-account --key-file=$FILE
+        gcloud auth activate-service-account --key-file="$FILE"
         terraform apply -auto-approve
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}

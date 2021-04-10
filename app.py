@@ -2,12 +2,17 @@ from flask import Flask, request
 import time
 from random import randint
 import sqlite3
-import datetime
+import ast
 
 
 app = Flask(__name__)
 sessions = []
+from configparser import ConfigParser
 
+config = ConfigParser()
+config.read('config.ini')
+conf = config['DATABASE']
+settings = config['SETTINGS']
 
 @app.route('/api/createUser', methods=["POST"])
 def createUser():
@@ -16,7 +21,7 @@ def createUser():
     """
     args = request.get_json()
     # print(args)
-    conn = sqlite3.connect('nesamani.db')
+    conn = sqlite3.connect(conf['path'])
     cur = conn.cursor()
     try:
         cur.execute(f"""insert into Users (name, email, pwd, utc, age, uid) values(?, ?, ?, ?, ?, ?)""",
@@ -26,7 +31,7 @@ def createUser():
         return {"message": "Inserted into DB successfully!"}, 201
     except sqlite3.IntegrityError:
         conn.close()
-        return {'msg': 'Email ID taken!'}, 404
+        return {"msg": "Email ID taken!"}, 404
 
 
 @app.route('/api/loginUser', methods=['GET'])
@@ -36,7 +41,7 @@ def loginUser():
     """
     args = request.get_json()
     # print(args)
-    conn = sqlite3.connect('nesamani.db')
+    conn = sqlite3.connect(conf['path'])
     cur = conn.cursor()
     try:
         cur.execute(f"select pwd from users where email=?",(args["email"],))
@@ -62,7 +67,7 @@ def getUser():
     """
     args = request.get_json()
     # print(args)
-    conn = sqlite3.connect('nesamani.db')
+    conn = sqlite3.connect(conf['path'])
     cur = conn.cursor()
     try:
         cur.execute(f"select * from users where email=?", (args["email"],))
@@ -92,7 +97,7 @@ def updateUser():
     Do it later
     """
     # args = request.get_json()
-    conn = sqlite3.connect('nesamani.db')
+    conn = sqlite3.connect(conf['path'])
     # cur = conn.cursor()
     conn.close()
     return {"msg": "Not implemented yet"}
@@ -107,7 +112,7 @@ def deleteUser():
     args = request.get_json()
     if args['email'] in sessions:
         return {"msg": "Not implemented yet"}
-    conn = sqlite3.connect('nesamani.db')
+    conn = sqlite3.connect(conf['path'])
     # cur = conn.cursor()
     conn.close()
     return {"msg": "Not implemented yet"}
@@ -135,7 +140,7 @@ def createProject():
         pid = randint(0, 9999999)
         utc = time.time()
         try:
-            conn = sqlite3.connect('nesamani.db')
+            conn = sqlite3.connect(conf['path'])
             cur = conn.cursor()
             cur.execute(f"""insert into Projects(pid, title, desc, umail, utc) values(?,?,?,?,?)""",
                 (pid,
@@ -158,19 +163,37 @@ def getFeed():
     Get all projects for feed
     """
     try:
-        conn = sqlite3.connect('nesamani.db')
+        conn = sqlite3.connect(conf['path'])
         cur = conn.cursor()
         cur.execute('select * from projects')
         data = cur.fetchall()
+        '''
         response = {
             "pid": [x[0] for x in data],
             'title': [x[1] for x in data],
             'desc': [x[2] for x in data],
             'umail': [x[3] for x in data],
-            'utc': [x[4] for x in data]
+            'utc': [time.strftime("%D", time.localtime(x[4]) for x in data]
         }
+        '''
+        r = '{\n'
+
+        for x in data:
+            response = str({
+                "pid": x[0],
+                "title": x[1],
+                "desc": x[2],
+                "umail": x[3],
+                "utc": time.strftime("%D", time.localtime(x[4]))
+            })
+            r += str(x[0]) + ":" + response + ',\n'
+        r += '}'
+        i = r.rindex(',')
+        r = r[:i] + r[i+1:] 
         conn.close()
-        return response, 200
+        print(r)
+        r = ast.literal_eval(r)
+        return r, 200
     except:
         conn.close()
         return {"msg": "ERROR!"}
@@ -183,7 +206,7 @@ def getProject():
     """
     pid = request.get_json()['pid']
     try:
-        conn = sqlite3.connect('nesamani.db')
+        conn = sqlite3.connect(conf['path'])
         cur = conn.cursor()
         cur.execute(f'select * from projects where pid=?',(pid,))
         x = cur.fetchone()
@@ -192,7 +215,7 @@ def getProject():
             'title': x[1],
             'desc': x[2],
             'umail': x[3],
-            'utc': x[4]
+            'utc': time.strftime("%D", time.localtime(x[4]))
         }
         conn.close()
         return response, 200
@@ -213,7 +236,7 @@ def addTeammate():
         return {"msg": "user not signed in!"}, 404
     # try:
     if True:
-        conn = sqlite3.connect('nesamani.db')
+        conn = sqlite3.connect(conf['path'])
         cur = conn.cursor()
         cur.execute(f'select umail from projects where pid=?', (args["pid"],))
         x = cur.fetchone()
@@ -253,7 +276,7 @@ def addTeammate():
 def getProjectLink():
     args = request.get_json()
     try:
-        conn = sqlite3.connect('nesamani.db')
+        conn = sqlite3.connect(conf['path'])
         cur = conn.cursor()
         cur.execute(f'select link from link where pid=?',(pid,))
         x = cur.fetchone()
@@ -267,7 +290,7 @@ def getProjectLink():
 def setProjectLink():
     pid = request.get_json()["pid"]
     try:
-        conn = sqlite3.connect('nesamani.db')
+        conn = sqlite3.connect(conf['path'])
         cur = conn.cursor()
         cur.execute(f'select link from link where pid=?',(pid,))
         x = cur.fetchone()
@@ -277,4 +300,4 @@ def setProjectLink():
         return {"msg": "Link not found!"}, 404
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=settings.getboolean('debug'), host=settings['host'])

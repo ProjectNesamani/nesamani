@@ -20,13 +20,17 @@ Create Tables
     pid, link, utc
 '''
 import sqlite3
+from configparser import ConfigParser
 
-
+config = ConfigParser()
+config.read('config.ini')
+conf = config['DATABASE']
+print()
 def createUsers():
     """
     Function to create the Users table
     """
-    conn = sqlite3.connect('nesamani.db')
+    conn = sqlite3.connect(conf['path'])
     cur = conn.cursor()
     # Add dp as string later
     cur.execute('''Create Table If Not Exists Users(\
@@ -45,7 +49,7 @@ def createProjects():
     """
     Function to create the Projects table
     """
-    conn = sqlite3.connect('nesamani.db')
+    conn = sqlite3.connect(conf['path'])
     cur = conn.cursor()
     # Add dp as string later
     cur.execute('''Create Table If Not Exists Projects(\
@@ -63,7 +67,7 @@ def createTags():
     """
     Function to create the Tags table
     """
-    conn = sqlite3.connect('nesamani.db')
+    conn = sqlite3.connect(conf['path'])
     cur = conn.cursor()
     # Add dp as string later
     cur.execute('''Create Table If Not Exists Tags(\
@@ -78,7 +82,7 @@ def createRatings():
     """
     Function to create the Ratings table
     """
-    conn = sqlite3.connect('nesamani.db')
+    conn = sqlite3.connect(conf['path'])
     cur = conn.cursor()
     # Add dp as string later
     cur.execute('''Create Table If Not Exists Ratings(\
@@ -96,7 +100,7 @@ def createTeam():
     """
     Function to create the Team table
     """
-    conn = sqlite3.connect('nesamani.db')
+    conn = sqlite3.connect(conf['path'])
     cur = conn.cursor()
     # Add dp as string later
     # name varchar(32) not null,\
@@ -114,7 +118,7 @@ def createLinks():
     """
     Function to create the Links table
     """
-    conn = sqlite3.connect('nesamani.db')
+    conn = sqlite3.connect(conf['path'])
     cur = conn.cursor()
     # Add dp as string later
     # name varchar(32) not null,\

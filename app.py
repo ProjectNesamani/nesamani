@@ -169,7 +169,7 @@ def getFeed():
             'title': [x[1] for x in data],
             'desc': [x[2] for x in data],
             'umail': [x[3] for x in data],
-            'utc': [x[4] for x in data]
+            'utc': [time.strftime("%D", time.localtime(x[4]) for x in data]
         }
         conn.close()
         return response, 200
@@ -194,7 +194,7 @@ def getProject():
             'title': x[1],
             'desc': x[2],
             'umail': x[3],
-            'utc': x[4]
+            'utc': time.strftime("%D", time.localtime(x[4])
         }
         conn.close()
         return response, 200
@@ -249,11 +249,11 @@ def addTeammate():
                 '{args["omail"]}',\
                 {time.time()}
             );""")
-    ''' 
+
     except:
         conn.close()
         return {"msg": "Project not found 2!"}, 404
-    '''
+
 
 
 @app.route('/api/getProjectLink', methods=["GET"])

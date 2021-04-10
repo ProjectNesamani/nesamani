@@ -37,12 +37,12 @@ print(response.json())
 
 # 4. Get project that exists
 response = requests.get(BASE+'/getProject', json={
-    "pid": 7788248
+    "idea_id": 7788248
     })
 print(response.json())
 # 5. Get project that dont exists
 response = requests.get(BASE+'/getProject', json={
-    "pid": 69
+    "idea_id": 69
     })
 print(response.json())
 # 6. Add teammate to project that exists

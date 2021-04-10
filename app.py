@@ -4,7 +4,7 @@ from random import randint
 import sqlite3
 import ast
 
-
+# NOTE : user_id === email
 app = Flask(__name__)
 sessions = []
 
@@ -39,12 +39,12 @@ def loginUser():
     conn = sqlite3.connect('nesamani.db')
     cur = conn.cursor()
     try:
-        cur.execute(f"select pwd from users where email=?",(args["email"],))
+        cur.execute(f"select pwd from users where email=?",(args["user_id"],))
         pwd = cur.fetchone()
         # print(pwd)
         if pwd[0] == args['pwd']:
-            if args['email'] not in sessions:
-                sessions.append(args['email'])
+            if args['user_id'] not in sessions:
+                sessions.append(args['user_id'])
                 return {"msg": "Login successful!"}, 200
             else:
                 return {"msg": "Already logged in!"}, 404
@@ -65,14 +65,14 @@ def getUser():
     conn = sqlite3.connect('nesamani.db')
     cur = conn.cursor()
     try:
-        cur.execute(f"select * from users where email=?", (args["email"],))
+        cur.execute(f"select * from users where email=?", (args["user_id"],))
         details = cur.fetchone()
         # print(pwd)
         if details[0]:
             if args['email'] not in sessions:
                 data = {
                     'user_name': details[0],
-                    'email': details[1],
+                    'user_id': details[1],
                     'joined_on': time.strftime("%D", time.localtime(details[3])),
                 }
                 return data, 200
@@ -105,7 +105,7 @@ def deleteUser():
     Do it later
     """
     args = request.get_json()
-    if args['email'] in sessions:
+    if args['user_id'] in sessions:
         return {"msg": "Not implemented yet"}
     conn = sqlite3.connect('nesamani.db')
     # cur = conn.cursor()
@@ -119,8 +119,8 @@ def logoutUser():
     Requires email
     """
     args = request.get_json()
-    if args['email'] in sessions:
-        sessions.remove(args['email'])
+    if args['user_id'] in sessions:
+        sessions.remove(args['user_id'])
         return {"msg": "Logout successful!"}, 200
     return {"msg": "User not logged in!"}, 404
 
@@ -131,7 +131,7 @@ def createProject():
     Requires email, title, description to create project
     """
     args = request.get_json()
-    if args['email'] in sessions:
+    if args['user_id'] in sessions:
         pid = randint(0, 9999999)
         utc = time.time()
         try:
@@ -141,7 +141,7 @@ def createProject():
                 (pid,
                 args['title'],
                 args['description'],
-                args['email'],
+                args['user_id'],
                 utc))
             conn.commit()
             conn.close()

@@ -4,6 +4,8 @@ on:
   pull_request:
     branches:
     - development
+    - feature/*
+    - bugfix/*
 jobs:
   Snyk:
     runs-on: ubuntu-latest

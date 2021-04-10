@@ -76,7 +76,7 @@ jobs:
       uses: google-github-actions/setup-gcloud@master
       with:
         project_id: ${{ secrets.GKE_PROJECT }}
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         export_default_credentials: true
 
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
@@ -102,11 +102,7 @@ jobs:
       # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
     - name: Terraform Apply
       if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-      run: |
-        echo "$GOOGLE_APPLICATION_CREDENTIALS" >> "$FILE"
-        gcloud auth activate-service-account --key-file="$FILE"
-        terraform apply -auto-approve
+      run: terraform apply -auto-approve
       env:
         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-        FILE: ${{ secrets.FILEPATH }}

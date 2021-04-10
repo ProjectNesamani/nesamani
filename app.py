@@ -12,18 +12,18 @@ sessions = []
 @app.route('/api/createUser', methods=["POST"])
 def createUser():
     """
-    Requires email, pwd, name, bio and age
+    Requires email, pwd, name, bio #and age
     """
     args = request.get_json()
     # print(args)
     conn = sqlite3.connect('nesamani.db')
     cur = conn.cursor()
     try:
-        cur.execute(f"""insert into Users (name, email, pwd, utc, age, uid) values(?, ?, ?, ?, ?, ?)""",
-             (args['name'],args['email'],args['pwd'],time.time(),args['age'], randint(0, 999999)))
+        cur.execute(f"""insert into Users (name, email, pwd, utc, uid) values(?, ?, ?, ?, ?)""",
+            (args['name'], args['email'], args['pwd'], time.time(), randint(0, 999999)))
         conn.commit()
         conn.close()
-        return {"message": "Inserted into DB successfully!"}, 201
+        return {"msg": "Inserted into DB successfully!"}, 201
     except sqlite3.IntegrityError:
         conn.close()
         return {"msg": "Email ID taken!"}, 404
@@ -140,7 +140,7 @@ def createProject():
             cur.execute(f"""insert into Projects(pid, title, desc, umail, utc) values(?,?,?,?,?)""",
                 (pid,
                 args['title'],
-                args['desc'],
+                args['description'],
                 args['email'],
                 utc))
             conn.commit()
@@ -171,22 +171,27 @@ def getFeed():
             'utc': [time.strftime("%D", time.localtime(x[4]) for x in data]
         }
         '''
-        r = '{\n'
+        r = '{"result":[\n'
 
         for x in data:
+            #print("no erroes here", x[3])
+            cur.execute('select name from users where email="{}";'.format(x[3]))
+            user_name = cur.fetchall()[0][0]
+            #print("username", user_name)
             response = str({
-                "pid": x[0],
+                "idea_id": x[0],
                 "title": x[1],
-                "desc": x[2],
-                "umail": x[3],
-                "utc": time.strftime("%D", time.localtime(x[4]))
+                "description": x[2],
+                "user_id": x[3],
+                "date": time.strftime("%D", time.localtime(x[4])),
+                "user_name": user_name
             })
-            r += str(x[0]) + ":" + response + ',\n'
-        r += '}'
+            r += response + ',\n'
+        r += ']}'
         i = r.rindex(',')
-        r = r[:i] + r[i+1:] 
+        r = r[:i] + r[i+1:]
         conn.close()
-        print(r)
+        #print(r)
         r = ast.literal_eval(r)
         return r, 200
     except:
@@ -199,21 +204,60 @@ def getProject():
     """
     Takes pid (project id) as input
     """
-    pid = request.get_json()['pid']
+    pid = request.get_json()['idea_id']
     try:
         conn = sqlite3.connect('nesamani.db')
         cur = conn.cursor()
         cur.execute(f'select * from projects where pid=?',(pid,))
         x = cur.fetchone()
+        cur.execute('select name from users where email="{}";'.format(x[3]))
+        user_name = cur.fetchall()[0][0]
         response = {
-            "pid": x[0],
+            "idea_id": x[0],
             'title': x[1],
-            'desc': x[2],
-            'umail': x[3],
-            'utc': time.strftime("%D", time.localtime(x[4]))
+            'description': x[2],
+            'user_id': x[3],
+            "user_name": user_name,
+            'date': time.strftime("%D", time.localtime(x[4]))
         }
         conn.close()
         return response, 200
+    except:
+        conn.close()
+        return {"msg": "Project not found!"}, 404
+
+
+@app.route('/api/getUserProject', methods=["GET"])
+def getUserProject():
+    """
+    Takes pid (project id) as input
+    """
+    umail = request.get_json()['user_id']
+    try:
+        conn = sqlite3.connect('nesamani.db')
+        cur = conn.cursor()
+        cur.execute(f'select * from projects where umail=?',(umail,))
+        data = cur.fetchall()
+        r = '{"result":[\n'
+
+        for x in data:
+            #print("no erroes here", x[3])
+            cur.execute('select name from users where email="{}";'.format(x[3]))
+            user_name = cur.fetchall()[0][0]
+            #print("username", user_name)
+            response = str({
+                "idea_id": x[0],
+                "title": x[1],
+                "description": x[2],
+                "user_id": x[3],
+                "date": time.strftime("%D", time.localtime(x[4])),
+                "user_name": user_name
+            })
+            r += response + ',\n'
+        r += ']}'
+        r = ast.literal_eval(r)
+        conn.close()
+        return r, 200
     except:
         conn.close()
         return {"msg": "Project not found!"}, 404

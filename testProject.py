@@ -16,7 +16,7 @@ response = requests.get(BASE+'/loginUser', json={
     "email": "realaddress@fake.com",
     })
 print(response.json())
-
+'''
 # 2. Create Project with existing user who is logged in
 response = requests.post(BASE+'/createProject', json={
     "title": "A Project",
@@ -24,14 +24,20 @@ response = requests.post(BASE+'/createProject', json={
     "email": "realaddress@fake.com",
     })
 print(response.json())
-
+'''
 # 3. Get projects for feed
 response = requests.get(BASE+'/feed')
+print(response.json())
+print('-----------')
+# 3. Get projects from user
+response = requests.get(BASE+'/getUserProject', json={
+    'email': "realaddress@fake.com"
+})
 print(response.json())
 
 # 4. Get project that exists
 response = requests.get(BASE+'/getProject', json={
-    "pid": 7645074
+    "pid": 7788248
     })
 print(response.json())
 # 5. Get project that dont exists
@@ -40,7 +46,7 @@ response = requests.get(BASE+'/getProject', json={
     })
 print(response.json())
 # 6. Add teammate to project that exists
-
+'''
 response = requests.post(BASE+'/createUser', json={
     "name": "Agastya",
     "pwd": "CloudLead",
@@ -55,3 +61,4 @@ response = requests.post(BASE+'/addTeamMate', json={
 })
 
 print(response.json())
+'''

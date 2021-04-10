@@ -34,7 +34,6 @@ def createUsers():
         email varchar(32) unique not null primary key,\
         pwd varchar(32) not null,\
         utc timestamp not null,\
-        age integer,\
         uid integer
     );''')
     conn.commit()

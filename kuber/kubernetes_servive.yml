@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: nesamani-service
+  name: nesamani-backend-service
 spec:
   selector:
-      app: app
+      app: nesamani
+      tier: backend
   ports:
-    - name: app
-      protocol: TCP
+    - protocol: TCP
       port: 5000
-      targetPort: 5000
+      targetPort: flask

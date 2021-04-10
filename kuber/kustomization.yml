@@ -1,6 +1,4 @@
 resources:
-- deployment.yaml
-images:
-- name: application
-  newName: nesamani_backend
-  newTag: v1.0.1
+- kubernetes_pv.yml
+- kubernetes_servive.yml
+- kubernetes_deploy.yml

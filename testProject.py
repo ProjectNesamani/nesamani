@@ -16,7 +16,7 @@ response = requests.get(BASE+'/loginUser', json={
     "user_id": "realaddress@fake.com",
     })
 print(response.json())
-'''
+
 # 2. Create Project with existing user who is logged in
 response = requests.post(BASE+'/createProject', json={
     "title": "A Project",
@@ -24,7 +24,7 @@ response = requests.post(BASE+'/createProject', json={
     "user_id": "realaddress@fake.com",
     })
 print(response.json())
-'''
+
 # 3. Get projects for feed
 response = requests.get(BASE+'/feed')
 print(response.json())

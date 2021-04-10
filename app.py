@@ -20,7 +20,7 @@ def createUser():
     cur = conn.cursor()
     try:
         cur.execute(f"""insert into Users (name, email, pwd, utc, uid) values(?, ?, ?, ?, ?)""",
-            (args['name'], args['email'], args['pwd'], time.time(), randint(0, 999999)))
+            (args['user_name'], args['user_id'], args['pwd'], time.time(), randint(0, 999999)))
         conn.commit()
         conn.close()
         return {"msg": "Inserted into DB successfully!"}, 201
@@ -69,7 +69,7 @@ def getUser():
         details = cur.fetchone()
         # print(pwd)
         if details[0]:
-            if args['email'] not in sessions:
+            if args['user_id'] not in sessions:
                 data = {
                     'user_name': details[0],
                     'user_id': details[1],

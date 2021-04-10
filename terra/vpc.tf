@@ -13,7 +13,7 @@ variable "creds" {
 provider "google" {
   project     = var.project_id
   region      = var.region
-  credentials = "${var.creds}"
+  credentials = var.creds
 }
 
 # VPC

@@ -2,7 +2,7 @@ from flask import Flask, request
 import time
 from random import randint
 import sqlite3
-import datetime
+import ast
 
 
 app = Flask(__name__)
@@ -26,7 +26,7 @@ def createUser():
         return {"message": "Inserted into DB successfully!"}, 201
     except sqlite3.IntegrityError:
         conn.close()
-        return {'msg': 'Email ID taken!'}, 404
+        return {"msg": "Email ID taken!"}, 404
 
 
 @app.route('/api/loginUser', methods=['GET'])
@@ -162,15 +162,33 @@ def getFeed():
         cur = conn.cursor()
         cur.execute('select * from projects')
         data = cur.fetchall()
+        '''
         response = {
             "pid": [x[0] for x in data],
             'title': [x[1] for x in data],
             'desc': [x[2] for x in data],
             'umail': [x[3] for x in data],
-            'utc': [x[4] for x in data]
+            'utc': [time.strftime("%D", time.localtime(x[4]) for x in data]
         }
+        '''
+        r = '{\n'
+
+        for x in data:
+            response = str({
+                "pid": x[0],
+                "title": x[1],
+                "desc": x[2],
+                "umail": x[3],
+                "utc": time.strftime("%D", time.localtime(x[4]))
+            })
+            r += str(x[0]) + ":" + response + ',\n'
+        r += '}'
+        i = r.rindex(',')
+        r = r[:i] + r[i+1:] 
         conn.close()
-        return response, 200
+        print(r)
+        r = ast.literal_eval(r)
+        return r, 200
     except:
         conn.close()
         return {"msg": "ERROR!"}
@@ -192,7 +210,7 @@ def getProject():
             'title': x[1],
             'desc': x[2],
             'umail': x[3],
-            'utc': x[4]
+            'utc': time.strftime("%D", time.localtime(x[4]))
         }
         conn.close()
         return response, 200

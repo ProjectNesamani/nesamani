@@ -28,6 +28,7 @@ print(response.json())
 # 3. Get projects for feed
 response = requests.get(BASE+'/feed')
 print(response.json())
+
 # 4. Get project that exists
 response = requests.get(BASE+'/getProject', json={
     "pid": 7645074
@@ -52,4 +53,5 @@ response = requests.post(BASE+'/addTeamMate', json={
     "umail": "realaddress@fake.com",
     "omail": "cloud@fake.com"
 })
+
 print(response.json())

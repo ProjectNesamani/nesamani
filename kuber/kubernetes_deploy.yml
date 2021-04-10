@@ -3,17 +3,45 @@ kind: Deployment
 metadata:
   name: nesamani-backend
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      app: app
+      app: nesamani
   template:
     metadata:
       labels:
-        app: app
+        app: nesamani
+        tier: backend
     spec:
       containers:
       - image: devagastya0/nesamani_backend:v1.0.1
         name: application
         ports:
-        - containerPort: 5000
+        - name: flask
+          containerPort: 5000
+        volumeMounts:
+        - name: nesamani-pv
+          mountPath: /mnt/data
+      volumes:
+        - name: nesamani-pv
+          persistentVolumeClaim:
+            claimName: nesamani-pv-claim-new
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nginx
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nesamani-backend
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 75

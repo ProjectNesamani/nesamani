@@ -7,13 +7,10 @@ variable "region" {
   description = "region"
   default     = "asia-south1-a"
 }
-variable "creds" {
-  description = "credentials"
-}
+
 provider "google" {
-  project     = var.project_id
-  region      = var.region
-  credentials = var.creds
+  project = var.project_id
+  region  = var.region
 }
 
 # VPC

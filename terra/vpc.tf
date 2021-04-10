@@ -5,7 +5,7 @@ variable "project_id" {
 
 variable "region" {
   description = "region"
-  default     = "asia-south1-a"
+  default     = "asia-south1"
 }
 
 provider "google" {

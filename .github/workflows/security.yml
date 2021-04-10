@@ -6,6 +6,8 @@ on:
     - development
     - feature/*
     - bugfix/*
+  push:
+    - master
 jobs:
   Snyk:
     runs-on: ubuntu-latest

@@ -3,11 +3,12 @@ name: Security vulnerability
 on:
   pull_request:
     branches:
-    - development
-    - 'feature/*'
-    - 'bugfix/*'
+      - development
+      - 'feature/*'
+      - 'bugfix/*'
   push:
-    - master
+    branches:
+      - master
 jobs:
   Snyk:
     runs-on: ubuntu-latest

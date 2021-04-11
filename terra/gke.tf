@@ -36,11 +36,11 @@ resource "google_container_cluster" "primary" {
 
 # Separately Managed Node Pool
 resource "google_container_node_pool" "primary_nodes" {
-  name       = "${google_container_cluster.primary.name}-node-pool"
-  location   = var.region
-  cluster    = google_container_cluster.primary.name
-  node_count = var.gke_num_nodes
-
+  name               = "${google_container_cluster.primary.name}-node-pool"
+  location           = var.region
+  cluster            = google_container_cluster.primary.name
+  node_count         = var.gke_num_nodes
+  initial_node_count = var.gke_num_nodes
   node_config {
     oauth_scopes = [
       "https://www.googleapis.com/auth/logging.write",

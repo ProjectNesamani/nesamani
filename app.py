@@ -11,7 +11,10 @@ from configparser import ConfigParser
 
 config = ConfigParser()
 config.read('/app/config.ini')
-conf = config['DATABASE']
+if os.getenv('stage')=='prod':
+    conf = config['DATABASE_PROD']
+else:
+    conf = config['DATABASE_DEV']
 settings = config['SETTINGS']
 
 @app.route('/api/createUser', methods=["POST"])

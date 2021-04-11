@@ -21,11 +21,13 @@ Create Tables
 '''
 import sqlite3
 from configparser import ConfigParser
-
+import os
 config = ConfigParser()
 config.read('/app/config.ini')
-conf = config['DATABASE']
-print()
+if os.getenv('stage')=='prod':
+    conf = config['DATABASE_PROD']
+else:
+    conf = config['DATABASE_DEV']
 def createUsers():
     """
     Function to create the Users table

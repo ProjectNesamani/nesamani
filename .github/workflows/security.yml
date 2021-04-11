@@ -17,6 +17,7 @@ jobs:
         # More details in https://github.com/snyk/actions#getting-your-snyk-token
         # or you can signup for free at https://snyk.co/SignUpGH
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        stage: dev
       with:
         image: nesa:test
         args: --file=Dockerfile

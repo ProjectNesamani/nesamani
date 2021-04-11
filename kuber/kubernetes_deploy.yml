@@ -18,6 +18,7 @@ spec:
         name: application
         ports:
         - name: flask
+          protocol: TCP
           containerPort: 5000
         volumeMounts:
         - name: nesamani-pv

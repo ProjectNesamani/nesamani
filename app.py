@@ -10,7 +10,7 @@ sessions = []
 from configparser import ConfigParser
 
 config = ConfigParser()
-config.read('config.ini')
+config.read('/app/config.ini')
 conf = config['DATABASE']
 settings = config['SETTINGS']
 

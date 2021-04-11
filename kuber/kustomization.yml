@@ -1,4 +1,4 @@
 resources:
-- kubernetes_pv.yml
 - kubernetes_servive.yml
 - kubernetes_deploy.yml
+- metrics.yml

@@ -65,7 +65,6 @@ jobs:
         stage: prod
     - name: Authenticate docker
       run: |-
-        gcloud auth activate-service-account "ci-cd-400@$PROJECT_ID.iam.gserviceaccount.com" --key-file=KEY-FILE
         gcloud auth configure-docker
     # Push the Docker image to Google Container Registry
     - name: Publish

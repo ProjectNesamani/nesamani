@@ -14,7 +14,7 @@ spec:
         tier: backend
     spec:
       containers:
-      - image: devagastya0/nesamani_backend:v1.0.1
+      - image: gcr.io/nesamani-sol21/nesamani-backend@sha256:87182b1244b048b3f16490c4113d2769ad15b6e2ac68922d2ee01cc21af6d79c
         name: application
         ports:
         - name: flask
